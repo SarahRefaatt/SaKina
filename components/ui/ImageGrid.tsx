@@ -619,7 +619,7 @@ export default function EcommerceProductGrid() {
                 className="group relative bg-neutral-900 rounded-lg overflow-hidden 
                          hover:bg-neutral-800/50 transition-all duration-500 
                          cursor-pointer border border-neutral-800 hover:border-neutral-700"
-                onClick={() => router.push(`/products/${product.id}`)}
+                onClick={() => router.push(`/${product.id}`)}
               >
                 {/* Image Container */}
                 <div className="relative aspect-[4/5] overflow-hidden">
@@ -634,9 +634,17 @@ export default function EcommerceProductGrid() {
                     />
                   ) : (
                     <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
-                      <span className="text-neutral-600 text-sm uppercase tracking-widest">
+                      {/* <span className="text-neutral-600 text-sm uppercase tracking-widest">
                         No Image
-                      </span>
+                      </span> */}
+                       <Image
+                      src={'/assets/sakina.png'}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                      priority={index < 4}
+                    />
                     </div>
                   )}
                   
@@ -671,11 +679,11 @@ export default function EcommerceProductGrid() {
                       {formatPrice(product.price)}
                     </span>
                     
-                    {product.stock_quantity > 0 && (
+                    {/* {product.stock_quantity > 0 && (
                       <span className="text-xs text-neutral-400 tracking-widest">
                         {product.stock_quantity} in stock
                       </span>
-                    )}
+                    )} */}
                   </div>
                 </div>
 

@@ -402,10 +402,27 @@ export default function Dashboard() {
   // 🔹 Show Loading
   if (loading || isAdmin === null) {
     return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold">Loading Dashboard...</h1>
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="flex flex-col items-center space-y-6">
+
+        {/* SAKINA Logo Loading Animation */}
+        <div className="relative">
+          <img
+            src="/assets/sakina.png" // <-- put your logo name here
+            alt="SAKINA Logo"
+            className="w-32 h-32 object-contain animate-pulse"
+          />
+
+          {/* Circular Loader Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-40 w-40 border-4 border-gray-800 border-t-white"></div>
+          </div>
+        </div>
+
+        <p className="text-gray-300 text-lg tracking-wide animate-pulse">Loading...</p>
       </div>
-    );
+    </div>
+  );
   }
 
   // 🔹 Restrict Access

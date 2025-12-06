@@ -224,17 +224,28 @@ export default function OrderConfirmation() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 max-w-md w-full mx-4">
-          <div className="flex flex-col items-center">
-            <div className="w-16 h-16 border-4 border-gray-500 dark:border-gray-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Loading...</h2>
-            {/* <p className="text-gray-600 dark:text-gray-300 mt-2">Please wait while we fetch your order information.</p> */}
+   return (
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="flex flex-col items-center space-y-6">
+
+        {/* SAKINA Logo Loading Animation */}
+        <div className="relative">
+          <img
+            src="/assets/sakina.png" // <-- put your logo name here
+            alt="SAKINA Logo"
+            className="w-32 h-32 object-contain animate-pulse"
+          />
+
+          {/* Circular Loader Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-40 w-40 border-4 border-gray-800 border-t-white"></div>
           </div>
         </div>
+
+        <p className="text-gray-300 text-lg tracking-wide animate-pulse">Loading...</p>
       </div>
-    );
+    </div>
+  );
   }
 
   if (cartItems.length === 0 && !loading) {

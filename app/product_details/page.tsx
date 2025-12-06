@@ -409,8 +409,8 @@ export default function ProductDashboard() {
             </div>
             
             {isLoading ? (
-              <div className="bg-white shadow rounded-lg p-6">
-                <p className="text-gray-500">Loading products...</p>
+              <div className="bg-black shadow rounded-lg p-6">
+                <p className="text-gray-100">Loading products...</p>
               </div>
             ) : products.length === 0 ? (
               <div className="bg-white shadow rounded-lg p-6">

@@ -329,6 +329,8 @@ import { useCartStore } from "@/app/store/cartStore";
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   // const router = useRouter();
+
+  console.log("Product ID from URL param:", id);
   const productId = parseInt(id, 10);
   
   const [product, setProduct] = useState<Product | null>(null);
@@ -454,10 +456,24 @@ const formatPrice = (price: number): string => {
 
 if (!product) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-black">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 dark:border-blue-500 mx-auto"></div>
-        <p className="mt-4 text-gray-600 dark:text-gray-400">Loading product details...</p>
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="flex flex-col items-center space-y-6">
+
+        {/* SAKINA Logo Loading Animation */}
+        <div className="relative">
+          <img
+            src="/assets/sakina.png" // <-- put your logo name here
+            alt="SAKINA Logo"
+            className="w-32 h-32 object-contain animate-pulse"
+          />
+
+          {/* Circular Loader Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-40 w-40 border-4 border-gray-800 border-t-white"></div>
+          </div>
+        </div>
+
+        <p className="text-gray-300 text-lg tracking-wide animate-pulse">Loading...</p>
       </div>
     </div>
   );
@@ -473,8 +489,11 @@ const nextImage = () => {
       prev === 0 ? product.image_urls.length - 1 : prev - 1
     );
   };
-return (
-<div className="min-h-screen bg-gray-50 dark:bg-black py-8">
+
+
+  return (
+<div className="min-h-screen bg-black py-8 text-gray-200">
+  
   {/* Notification */}
   <AnimatePresence>
     {notification.show && (
@@ -482,7 +501,7 @@ return (
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -50 }}
-        className="fixed top-4 right-4 bg-green-500 dark:bg-green-600 text-white px-6 py-3 rounded-md shadow-lg z-50"
+        className="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-md shadow-lg z-50"
       >
         {notification.message}
       </motion.div>
@@ -490,239 +509,152 @@ return (
   </AnimatePresence>
 
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden">
+    <div className="bg-black rounded-xl shadow-lg overflow-hidden border border-gray-800">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
-        {/* Product Images */}
+
+        {/* Product Image */}
         <div>
-          <div className="relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700 aspect-square mb-4">
+          <div className="relative overflow-hidden rounded-lg bg-gray-900 aspect-square mb-4">
             <motion.div 
               key={selectedImage}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
-              className="w-full h-full relative"
+              className="w-full h-full"
             >
               <Image
-                src={product.image_urls[selectedImage]}
+                src={'/assets/sakina.png'}
                 alt={product.name}
                 fill
                 className="object-cover"
                 priority
               />
             </motion.div>
-            
+
+            {/* Stock Labels */}
             {product.stock_quantity === 0 && (
-              <span className="absolute top-4 left-4 bg-red-500 text-white text-xs font-semibold px-2.5 py-1 rounded">
+              <span className="absolute top-4 left-4 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded">
                 OUT OF STOCK
               </span>
             )}
-            
+
             {product.stock_quantity > 0 && product.stock_quantity < 10 && (
-              <span className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-semibold px-2.5 py-1 rounded">
+              <span className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded">
                 LOW STOCK
               </span>
             )}
           </div>
-          
-          {product.image_urls && product.image_urls.length > 1 && (
+
+          {/* Thumbnail Images */}
+          {product.image_urls?.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
               {product.image_urls.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`aspect-square overflow-hidden rounded-md border-2 transition-all ${
-                    selectedImage === index 
-                      ? 'border-gray-500 dark:border-gray-400 scale-105' 
-                      : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                  className={`aspect-square rounded-md border-2 overflow-hidden transition ${
+                    selectedImage === index
+                      ? "border-white scale-105"
+                      : "border-gray-700 hover:border-gray-500"
                   }`}
                 >
-                  {/* <Image
-                    width={80}
-                    height={80}
-                    src={"/assets/IMG.JPG"}
-                    alt={`${product.name} view ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  /> */}
-                 <Image
+                  <Image
                     src={image}
                     alt={product.name}
-                     width={80}
+                    width={80}
                     height={80}
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      // Fallback if image fails to load
-                      e.currentTarget.src = image;
-                    }}
+                    className="object-cover"
                   />
                 </button>
               ))}
             </div>
           )}
         </div>
-        
+
         {/* Product Info */}
         <div className="flex flex-col justify-between">
           <div>
-            <div className="flex justify-between items-start ">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{product.name}</h1>
-            </div>
-            
-            {/* <div className="flex items-center mb-4">
-              <span className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs font-semibold px-2.5 py-0.5 rounded">
-                {product.category}
-              </span>
-              <span className="mx-3 text-gray-400">•</span>
-              <span className="text-gray-500 dark:text-gray-400 text-sm">SKU: {product.sku}</span>
-            </div> */}
-            
-            {/* <div className="mb-6">
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{product.description}</p>
-            </div> */}
-            
-            {/* Pricing */}
-            <div className="flex items-center mb-6 mt-2">
-              <span className="text-3xl font-bold text-gray-900 dark:text-white">{formatPrice(Number(product.price))}
-</span>
+            <h1 className="text-3xl font-bold text-white mb-2">{product.name}</h1>
+
+            {/* Price */}
+            <div className="text-3xl font-bold text-white mb-6">
+              {formatPrice(Number(product.price))}
             </div>
           </div>
-          
+
+          {/* Quantity Selector */}
           <div>
-            {/* Quantity Selector */}
-            <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Quantity</h3>
-              <div className="flex items-center">
-                <button
-                  onClick={decrementQuantity}
-                  disabled={quantity <= 1}
-                  className="p-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-gray-900 dark:text-white"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                  </svg>
-                </button>
-                <span className="px-4 py-2 border-t border-b border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 min-w-[3rem] text-center text-gray-900 dark:text-white">
-                  {quantity}
-                </span>
-                <button
-                  onClick={incrementQuantity}
-                  disabled={quantity >= product.stock_quantity}
-                  className="p-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-gray-900 dark:text-white"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-            
-            {/* Add to Cart Button */}
-            <div className="flex space-x-4">
+            <h3 className="text-sm mb-3 text-gray-300">Quantity</h3>
+            <div className="flex items-center mb-6">
               <button
-                onClick={handleAddToCart}
-                disabled={isAddingToCart || product.stock_quantity === 0}
-                className="flex-1 bg-gray-900 dark:bg-gray-700 text-white py-3 px-6 rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                onClick={decrementQuantity}
+                disabled={quantity <= 1}
+                            className="px-3 py-1 hover:bg-gray-800 text-gray-300 disabled:opacity-40 rounded-l-md"
               >
-                {isAddingToCart ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Stealing...
-                  </>
-                ) : product.stock_quantity === 0 ? (
-                  "Out of Stock"
-                ) : (
-                  <>
-                    {/* <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg> */}
-                    Steal
-                  </>
-                )}
+                -
+              </button>
+
+              <span className="px-4 py-2 bg-gray-100 border border-gray-100 text-black min-w-[3rem] text-center">
+                {quantity}
+              </span>
+
+              <button
+                onClick={incrementQuantity}
+                disabled={quantity >= product.stock_quantity}
+                            className="px-3 py-1 hover:bg-gray-800 text-gray-300 disabled:opacity-40 rounded-r-md"
+              >
+                +
               </button>
             </div>
+
+            {/* Add To Cart */}
+            <button
+              onClick={handleAddToCart}
+              disabled={isAddingToCart || product.stock_quantity === 0}
+              className="w-full bg-white text-black font-semibold py-3 rounded-md hover:bg-gray-200 
+                disabled:opacity-60 transition"
+            >
+              {isAddingToCart ? "Adding..." : product.stock_quantity === 0 ? "Out of Stock" : "Add to Cart"}
+            </button>
           </div>
         </div>
       </div>
-      
-      {/* Product Details Tabs */}
-      <div className="border-t border-gray-200 dark:border-gray-700">
+
+      {/* Tabs */}
+      <div className="border-t border-gray-800">
         <div className="px-8">
-          <div className="border-b border-gray-200 dark:border-gray-700">
-            <nav className="flex -mb-px">
-              <button 
-                onClick={() => setActiveTab("details")}
-                className={`ml-8 first:ml-0 py-4 px-1 border-b-2 text-sm font-medium ${
-                  activeTab === "details" 
-                    ? "border-gray-500 dark:border-gray-400 text-gray-600 dark:text-gray-300" 
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
+
+          <nav className="flex border-b border-gray-800">
+            {["details", "specs"].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`py-4 px-4 text-sm transition border-b-2 ${
+                  activeTab === tab
+                    ? "border-white text-white"
+                    : "border-transparent text-gray-400 hover:text-white"
                 }`}
               >
-                Details
+                {tab === "details" ? "Details" : "Specifications"}
               </button>
-              <button 
-                onClick={() => setActiveTab("specs")}
-                className={`ml-8 py-4 px-1 border-b-2 text-sm font-medium ${
-                  activeTab === "specs" 
-                    ? "border-gray-500 dark:border-gray-400 text-gray-600 dark:text-gray-300" 
-                    : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
-                }`}
-              >
-                Specifications
-              </button>
-            </nav>
-          </div>
-          
+            ))}
+          </nav>
+
           <div className="py-6">
             {activeTab === "details" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Product Description</h3>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{product.description}</p>
-                
-                {/* <h3 className="text-lg font-medium text-gray-900 dark:text-white mt-8 mb-4">Additional Information</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Category</p>
-                    <p className="text-gray-900 dark:text-white">{product.category}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Brand</p>
-                    <p className="text-gray-900 dark:text-white">{product.brand}</p>
-                  </div>
-                </div> */}
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <h3 className="text-lg font-semibold text-white mb-3">Product Description</h3>
+                <p className="text-gray-400 leading-relaxed">{product.description}</p>
               </motion.div>
             )}
-            
+
             {activeTab === "specs" && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Technical Specifications</h3>
-                <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
-                  {/* <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">SKU</dt>
-                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">{product.sku}</dd>
-                  </div> */}
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Weight</dt>
-                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">{product.weight} kg</dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Dimensions</dt>
-                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">{product.dimensions}</dd>
-                  </div>
-                  {/* <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Stock Quantity</dt>
-                    <dd className="mt-1 text-sm text-gray-900 dark:text-white">{product.stock_quantity}</dd>
-                  </div> */}
-                </dl>
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                <h3 className="text-lg font-semibold text-white mb-4">Technical Specs</h3>
+                <div className="grid grid-cols-2 gap-y-4">
+                  <p><span className="text-gray-400">Weight:</span> {product.weight} kg</p>
+                  <p><span className="text-gray-400">Dimensions:</span> {product.dimensions}</p>
+                </div>
               </motion.div>
             )}
           </div>
@@ -730,61 +662,322 @@ return (
       </div>
     </div>
   </div>
-
-  {/* Fixed Popover Modal - Won't close until button is pressed */}
-  {/* {showPopover !== null && (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-      // Removed the onClick handler that was closing the modal
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md p-6 text-center"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-      >
-        <div className="mb-2 flex justify-center">
-          <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-            <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-        </div>
-        
-        <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-          Item added to cart!
-        </h4>
-        
-        <p className="text-gray-600 dark:text-gray-300 mb-6">
-          <span className="font-medium">{product.name}</span> was successfully added to your shopping cart.
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={() => {
-              // Just close the popover, don't reload the page
-             window.location.reload();
-            }}
-            className="flex-1 py-3 px-4 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition font-medium"
-          >
-            Continue Shopping
-          </button>
-          <button
-            onClick={() => {
-              setShowPopover(null);
-              router.push("/cart");
-            }}
-            className="flex-1 py-3 px-4 rounded-lg bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 transition font-medium"
-          >
-            Go to Cart
-          </button>
-        </div>
-      </motion.div>
-    </motion.div>
-  )} */}
 </div>
 );
+
+// return (
+// <div className="min-h-screen bg-black dark:bg-black py-8">
+//   {/* Notification */}
+//   <AnimatePresence>
+//     {notification.show && (
+//       <motion.div
+//         initial={{ opacity: 0, y: -50 }}
+//         animate={{ opacity: 1, y: 0 }}
+//         exit={{ opacity: 0, y: -50 }}
+//         className="fixed top-4 right-4 bg-green-500 dark:bg-green-600 text-white px-6 py-3 rounded-md shadow-lg z-50"
+//       >
+//         {notification.message}
+//       </motion.div>
+//     )}
+//   </AnimatePresence>
+
+//   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+//     <div className="bg-black dark:bg-black rounded-xl shadow-lg overflow-hidden">
+//       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+//         {/* Product Images */}
+//         <div>
+//           <div className="relative overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700 aspect-square mb-4">
+//             <motion.div 
+//               key={selectedImage}
+//               initial={{ opacity: 0 }}
+//               animate={{ opacity: 1 }}
+//               transition={{ duration: 0.3 }}
+//               className="w-full h-full relative"
+//             >
+//               <Image
+//                 // src={product.image_urls[selectedImage]}
+//                 src={'/assets/sakina.png'}
+//                 alt={product.name}
+//                 fill
+//                 className="object-cover"
+//                 priority
+//               />
+//             </motion.div>
+            
+//             {product.stock_quantity === 0 && (
+//               <span className="absolute top-4 left-4 bg-red-500 text-white text-xs font-semibold px-2.5 py-1 rounded">
+//                 OUT OF STOCK
+//               </span>
+//             )}
+            
+//             {product.stock_quantity > 0 && product.stock_quantity < 10 && (
+//               <span className="absolute top-4 left-4 bg-orange-500 text-white text-xs font-semibold px-2.5 py-1 rounded">
+//                 LOW STOCK
+//               </span>
+//             )}
+//           </div>
+          
+//           {product.image_urls && product.image_urls.length > 1 && (
+//             <div className="grid grid-cols-4 gap-2">
+//               {product.image_urls.map((image, index) => (
+//                 <button
+//                   key={index}
+//                   onClick={() => setSelectedImage(index)}
+//                   className={`aspect-square overflow-hidden rounded-md border-2 transition-all ${
+//                     selectedImage === index 
+//                       ? 'border-gray-500 dark:border-gray-400 scale-105' 
+//                       : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+//                   }`}
+//                 >
+//                   {/* <Image
+//                     width={80}
+//                     height={80}
+//                     src={"/assets/IMG.JPG"}
+//                     alt={`${product.name} view ${index + 1}`}
+//                     className="w-full h-full object-cover"
+//                   /> */}
+//                  <Image
+//                     src={image}
+//                     alt={product.name}
+//                      width={80}
+//                     height={80}
+//                     className="object-cover group-hover:scale-105 transition-transform duration-300"
+//                     onError={(e) => {
+//                       // Fallback if image fails to load
+//                       e.currentTarget.src = image;
+//                     }}
+//                   />
+//                 </button>
+//               ))}
+//             </div>
+//           )}
+//         </div>
+        
+//         {/* Product Info */}
+//         <div className="flex flex-col justify-between">
+//           <div>
+//             <div className="flex justify-between items-start ">
+//               <h1 className="text-3xl font-bold text-white dark:text-white">{product.name}</h1>
+//             </div>
+            
+//             {/* <div className="flex items-center mb-4">
+//               <span className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs font-semibold px-2.5 py-0.5 rounded">
+//                 {product.category}
+//               </span>
+//               <span className="mx-3 text-gray-400">•</span>
+//               <span className="text-gray-500 dark:text-gray-400 text-sm">SKU: {product.sku}</span>
+//             </div> */}
+            
+//             {/* <div className="mb-6">
+//               <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{product.description}</p>
+//             </div> */}
+            
+//             {/* Pricing */}
+//             <div className="flex items-center mb-6 mt-2">
+//               <span className="text-3xl font-bold text-white dark:text-white">{formatPrice(Number(product.price))}
+// </span>
+//             </div>
+//           </div>
+          
+//           <div>
+//             {/* Quantity Selector */}
+//             <div className="mb-6">
+//               <h3 className="text-sm font-medium text-white dark:text-white mb-4">Quantity</h3>
+//               <div className="flex items-center">
+//                 <button
+//                   onClick={decrementQuantity}
+//                   disabled={quantity <= 1}
+//                   className="p-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-gray-900 dark:text-white"
+//                 >
+//                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+//                   </svg>
+//                 </button>
+//                 <span className="px-4 py-2 border-t border-b border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 min-w-[3rem] text-center text-gray-900 dark:text-white">
+//                   {quantity}
+//                 </span>
+//                 <button
+//                   onClick={incrementQuantity}
+//                   disabled={quantity >= product.stock_quantity}
+//                   className="p-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-gray-900 dark:text-white"
+//                 >
+//                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+//                   </svg>
+//                 </button>
+//               </div>
+//             </div>
+            
+//             {/* Add to Cart Button */}
+//             <div className="flex space-x-4">
+//               <button
+//                 onClick={handleAddToCart}
+//                 disabled={isAddingToCart || product.stock_quantity === 0}
+//                 className="flex-1 bg-white dark:bg-white text-black py-3 px-6 rounded-md hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors flex items-center justify-center disabled:opacity-75 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+//               >
+//                 {isAddingToCart ? (
+//                   <>
+//                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+//                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+//                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+//                     </svg>
+//                     Adding...
+//                   </>
+//                 ) : product.stock_quantity === 0 ? (
+//                   "Out of Stock"
+//                 ) : (
+//                   <>
+//                     {/* <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+//                     </svg> */}
+//                     Add to Cart
+//                   </>
+//                 )}
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+      
+//       {/* Product Details Tabs */}
+//       <div className="border-t border-gray-200 dark:border-gray-700">
+//         <div className="px-8">
+//           <div className="border-b border-gray-200 dark:border-gray-700">
+//             <nav className="flex -mb-px">
+//               <button 
+//                 onClick={() => setActiveTab("details")}
+//                 className={`ml-8 first:ml-0 py-4 px-1 border-b-2 text-sm font-medium ${
+//                   activeTab === "details" 
+//                     ? "border-gray-100 dark:border-gray-100 text-gray-600 dark:text-gray-300" 
+//                     : "border-transparent text-gray-100 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
+//                 }`}
+//               >
+//                 Details
+//               </button>
+//               <button 
+//                 onClick={() => setActiveTab("specs")}
+//                 className={`ml-8 py-4 px-1 border-b-2 text-sm font-medium ${
+//                   activeTab === "specs" 
+//                     ? "border-gray-100 dark:border-gray-100 text-gray-600 dark:text-gray-300" 
+//                     : "border-transparent text-gray-100 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-500"
+//                 }`}
+//               >
+//                 Specifications
+//               </button>
+//             </nav>
+//           </div>
+          
+//           <div className="py-6">
+//             {activeTab === "details" && (
+//               <motion.div
+//                 initial={{ opacity: 0, y: 10 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 transition={{ duration: 0.3 }}
+//               >
+//                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Product Description</h3>
+//                 <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{product.description}</p>
+                
+//                 {/* <h3 className="text-lg font-medium text-gray-900 dark:text-white mt-8 mb-4">Additional Information</h3>
+//                 <div className="grid grid-cols-2 gap-4">
+//                   <div>
+//                     <p className="text-sm text-gray-500 dark:text-gray-400">Category</p>
+//                     <p className="text-gray-900 dark:text-white">{product.category}</p>
+//                   </div>
+//                   <div>
+//                     <p className="text-sm text-gray-500 dark:text-gray-400">Brand</p>
+//                     <p className="text-gray-900 dark:text-white">{product.brand}</p>
+//                   </div>
+//                 </div> */}
+//               </motion.div>
+//             )}
+            
+//             {activeTab === "specs" && (
+//               <motion.div
+//                 initial={{ opacity: 0, y: 10 }}
+//                 animate={{ opacity: 1, y: 0 }}
+//                 transition={{ duration: 0.3 }}
+//               >
+//                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Technical Specifications</h3>
+//                 <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+//                   {/* <div className="sm:col-span-1">
+//                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">SKU</dt>
+//                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">{product.sku}</dd>
+//                   </div> */}
+//                   <div className="sm:col-span-1">
+//                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Weight</dt>
+//                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">{product.weight} kg</dd>
+//                   </div>
+//                   <div className="sm:col-span-1">
+//                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Dimensions</dt>
+//                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">{product.dimensions}</dd>
+//                   </div>
+//                   {/* <div className="sm:col-span-1">
+//                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Stock Quantity</dt>
+//                     <dd className="mt-1 text-sm text-gray-900 dark:text-white">{product.stock_quantity}</dd>
+//                   </div> */}
+//                 </dl>
+//               </motion.div>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   </div>
+
+//   {/* Fixed Popover Modal - Won't close until button is pressed */}
+//   {/* {showPopover !== null && (
+//     <motion.div
+//       initial={{ opacity: 0 }}
+//       animate={{ opacity: 1 }}
+//       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+//       // Removed the onClick handler that was closing the modal
+//     >
+//       <motion.div
+//         initial={{ scale: 0.9, opacity: 0 }}
+//         animate={{ scale: 1, opacity: 1 }}
+//         transition={{ type: "spring", stiffness: 300, damping: 25 }}
+//         className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md p-6 text-center"
+//         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+//       >
+//         <div className="mb-2 flex justify-center">
+//           <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+//             <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+//               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+//             </svg>
+//           </div>
+//         </div>
+        
+//         <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+//           Item added to cart!
+//         </h4>
+        
+//         <p className="text-gray-600 dark:text-gray-300 mb-6">
+//           <span className="font-medium">{product.name}</span> was successfully added to your shopping cart.
+//         </p>
+        
+//         <div className="flex flex-col sm:flex-row gap-3">
+//           <button
+//             onClick={() => {
+//               // Just close the popover, don't reload the page
+//              window.location.reload();
+//             }}
+//             className="flex-1 py-3 px-4 rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition font-medium"
+//           >
+//             Continue Shopping
+//           </button>
+//           <button
+//             onClick={() => {
+//               setShowPopover(null);
+//               router.push("/cart");
+//             }}
+//             className="flex-1 py-3 px-4 rounded-lg bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 transition font-medium"
+//           >
+//             Go to Cart
+//           </button>
+//         </div>
+//       </motion.div>
+//     </motion.div>
+//   )} */}
+// </div>
+// );
 }

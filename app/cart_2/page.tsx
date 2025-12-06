@@ -143,18 +143,27 @@ console.log('Cart items:', cartItems);
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
-        <div className="container mx-auto px-4 max-w-6xl">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
-          <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="flex justify-center items-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-            </div>
-            <p className="text-gray-500 mt-4">Loading your cart...</p>
+    <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="flex flex-col items-center space-y-6">
+
+        {/* SAKINA Logo Loading Animation */}
+        <div className="relative">
+          <img
+            src="/assets/sakina.png" // <-- put your logo name here
+            alt="SAKINA Logo"
+            className="w-32 h-32 object-contain animate-pulse"
+          />
+
+          {/* Circular Loader Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-40 w-40 border-4 border-gray-800 border-t-white"></div>
           </div>
         </div>
+
+        <p className="text-gray-300 text-lg tracking-wide animate-pulse">Loading...</p>
       </div>
-    );
+    </div>
+  );
   }
 
   // Empty cart message
